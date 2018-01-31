@@ -1,2 +1,4 @@
----
-# defaults file for aws_route53
+# This is used to look up the aws account id in the 'aws' dict. Required.
+aws_route53_profile_account: xvt_aws
+aws_route53_profile_account_role_arn: "arn:aws:iam::{{ aws[aws_route53_profile_account].id }}:role/route53_admin"
+aws_route53_profile_account_region: "{{ aws[aws_route53_profile_account].region|default(region) }}"

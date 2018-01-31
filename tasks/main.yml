@@ -1,2 +1,34 @@
----
-# tasks file for aws_route53
+# remember to add aws_profile_account role into requirement.yml
+- include_role:
+   name: aws_profile_account
+  vars:
+    aws_profile_account_role_arn: "{{ aws_route53_profile_account_role_arn }}"
+    aws_profile_account_role_session_name: 'role: aws_route53 - DNS operation'
+    aws_profile_account_region: "{{ aws_route53_profile_account_region }}"
+  when: not aws_route53_profile|default()
+
+- name: set credentials fact
+  set_fact:
+    sts_creds: "{{ (sts_result|default({})).sts_creds|default({}) }}"
+  no_log: yes
+
+# Take a dict aws_route53 and create dns entry. See
+# http://docs.ansible.com/ansible/latest/route53_module.html
+- name: Create DNS record in {{ aws_route53_profile_account }} zone {{ aws_route53_zone }}
+  route53:
+    private_zone: "{{ aws_route53.private_zone|default('no') }}"
+    state: "{{ aws_route53.state|default('create') }}"
+    zone: "{{ aws_route53.zone }}"
+    record: "{{ aws_route53.record }}"
+    value: "{{  aws_route53.value|default(omit) }}"
+    type: "{{ aws_route53.type|default('A') }}"
+    ttl: "{{ aws_route53.ttl|default(300) }}"
+    overwrite: "{{ aws_route53.overwrite|default('yes') }}"
+    retry_interval: "{{ aws_route53.retry_interval|default(5) }}"
+    weight: "{{ aws_route53.weight|default(omit) }}"
+    vpc_id: "{{ aws_route53.vpc_id|default(omit) if aws_route53.private_zone|default(False) else omit }}"
+    profile: "{{ aws_route53_profile|default(omit) }}"
+    aws_access_key: "{{ sts_creds.access_key|default(omit) }}"
+    aws_secret_key: "{{ sts_creds.secret_key|default(omit) }}"
+    security_token: "{{ sts_creds.session_token|default(omit) }}"
+    region: "{{ aws_route53.region|default(omit) }}"
