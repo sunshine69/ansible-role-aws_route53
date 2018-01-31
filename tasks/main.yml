@@ -12,15 +12,6 @@
     sts_creds: "{{ (sts_result|default({})).sts_creds|default({}) }}"
   no_log: yes
 
-- debug:
-    msg: |
-      Going to create DNS record: {{ aws_route53.record }}
-      Value: {{ aws_route53.value }}
-      In: {{ aws_route53_profile_account }}
-      Zone: {{ aws_route53.zone }}
-      Use: {{ aws_route53_profile|default('IAM assume role ' + aws_profile_account_role_arn|default('no-arn-here')) }}
-    verbosity: 2
-
 # Take a dict aws_route53 and create dns entry. See
 # http://docs.ansible.com/ansible/latest/route53_module.html
 - name: Create DNS record in {{ aws_route53_profile_account }} zone {{ aws_route53_zone }}
