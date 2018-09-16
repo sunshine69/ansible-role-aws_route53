@@ -1,0 +1,41 @@
+# in aws route53 deletion needs to supply the details of the record thus we can
+# not simply call the module with state: absent without first query the record
+# information.
+
+- name: Get the hosted zone infor
+  route53_facts:
+    dns_name: "{{ aws_route53.zone }}"
+    query: hosted_zone
+    hosted_zone_method: list_by_name
+    profile: "{{ profile|default(omit) }}"
+  register: hosted_zone_out
+
+- set_fact:
+    hosted_zone_id: "{{ hosted_zone_out.HostedZones.0.Id.split('/')[2] }}"
+
+- name: Get the record set info
+  route53_facts:
+    profile: "{{ profile|default(omit) }}"
+    query: record_sets
+    hosted_zone_id: "{{ hosted_zone_id }}"
+    start_record_name: "{{ aws_route53.record }}"
+    max_items: 2
+  register: record_set_out
+
+- debug:
+    var: record_set_out
+
+- name: Remove Route 53 internal rds master record entry
+  route53:
+    profile: "{{ profile|default(omit) }}"
+    private_zone: true
+    state: absent
+    zone: "{{ aws_route53.zone }}"
+    record: "{{ item.Name[0:-1] }}"
+    value: "{{ item.ResourceRecords.0.Value }}"
+    type: "{{ item.Type }}"
+    retry_interval: 5
+    overwrite: true
+    ttl: "{{ item.TTL }}"
+  with_items: "{{ record_set_out.ResourceRecordSets }}"
+  when: item.Name[0:-1] == aws_route53.zone
