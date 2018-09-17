@@ -38,4 +38,4 @@
     overwrite: true
     ttl: "{{ item.TTL }}"
   with_items: "{{ record_set_out.ResourceRecordSets }}"
-  when: item.Name[0:-1] == aws_route53.zone
+  when: item.Name[0:-1] == aws_route53.record
