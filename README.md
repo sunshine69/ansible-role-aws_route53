@@ -82,16 +82,22 @@ role: aws_profile_account
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
 
-    - hosts: servers
-      tasks:
-        - include_role:
-            name: aws_route53
-          vars:
-            aws_route53_profile: xvt_sandbox
-            aws_route53:
+```
+- hosts: servers
+  tasks:
+    - include_role:
+        name: aws_route53
+      vars:
+        aws_route53_profile: xvt_sandbox
+        stage: delete
+        aws_route53:
+          zone: "sbd.aws.planningportal.internal"
+          record: "stevek-test.sbd.aws.planningportal.internal"
+          value: "1.1.1.1"
+          private_zone: yes
 
+```
 
 License
 -------
