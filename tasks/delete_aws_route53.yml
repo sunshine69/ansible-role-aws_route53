@@ -7,7 +7,10 @@
     dns_name: "{{ aws_route53.zone }}"
     query: hosted_zone
     hosted_zone_method: list_by_name
-    profile: "{{ profile|default(omit) }}"
+    profile: "{{ aws_route53_profile|default(omit) }}"
+    aws_access_key: "{{ sts_creds.access_key|default(omit) }}"
+    aws_secret_key: "{{ sts_creds.secret_key|default(omit) }}"
+    security_token: "{{ sts_creds.session_token|default(omit) }}"
   register: hosted_zone_out
 
 - set_fact:
@@ -15,7 +18,10 @@
 
 - name: Get the record set info
   route53_facts:
-    profile: "{{ profile|default(omit) }}"
+    profile: "{{ aws_route53_profile|default(omit) }}"
+    aws_access_key: "{{ sts_creds.access_key|default(omit) }}"
+    aws_secret_key: "{{ sts_creds.secret_key|default(omit) }}"
+    security_token: "{{ sts_creds.session_token|default(omit) }}"
     query: record_sets
     hosted_zone_id: "{{ hosted_zone_id }}"
     start_record_name: "{{ aws_route53.record }}"
@@ -27,7 +33,10 @@
 
 - name: Remove Route 53 internal rds master record entry
   route53:
-    profile: "{{ profile|default(omit) }}"
+    profile: "{{ aws_route53_profile|default(omit) }}"
+    aws_access_key: "{{ sts_creds.access_key|default(omit) }}"
+    aws_secret_key: "{{ sts_creds.secret_key|default(omit) }}"
+    security_token: "{{ sts_creds.session_token|default(omit) }}"
     private_zone: true
     state: absent
     zone: "{{ aws_route53.zone }}"
