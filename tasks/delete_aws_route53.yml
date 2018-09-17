@@ -37,7 +37,7 @@
     aws_access_key: "{{ sts_creds.access_key|default(omit) }}"
     aws_secret_key: "{{ sts_creds.secret_key|default(omit) }}"
     security_token: "{{ sts_creds.session_token|default(omit) }}"
-    private_zone: true
+    private_zone: "{{ aws_route53.private_zone|default('yes') }}"
     state: absent
     zone: "{{ aws_route53.zone }}"
     record: "{{ item.Name[0:-1] }}"
