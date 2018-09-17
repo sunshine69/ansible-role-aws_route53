@@ -2,7 +2,7 @@
 # http://docs.ansible.com/ansible/latest/route53_module.html
 - name: Create DNS record in {{ aws_route53_profile_account }} zone {{ aws_route53_zone }}
   route53:
-    private_zone: "{{ aws_route53.private_zone|default('no') }}"
+    private_zone: "{{ aws_route53.private_zone|default('yes') }}"
     state: "{{ aws_route53.state|default('create') }}"
     zone: "{{ aws_route53.zone }}"
     record: "{{ aws_route53.record }}"
