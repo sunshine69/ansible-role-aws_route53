@@ -10,24 +10,27 @@ Requirements
 Role Variables
 --------------
 
-`aws_route53_profile_account` - required - default: xvt_aws 
+`aws_route53_profile_account` - Optional - default: xvt_aws
  - the aws profile account name defined in the `aws` dict. This is to lookup
-   the aws account id which is used to create the route53 entry.
+   the aws account id which is used to create the route53 entry. This is only
+   required when aws_route53_profile is not provided so we need to use the role
+   `aws_profile_account` to get the sts assume role route53_admin in the target
+   aws account.
 
-`aws_route53_profile_account_role_arn` - required - default: "arn:aws:iam::{{
-   aws[aws_route53_profile_account].id }}:role/route53_admin" 
+`aws_route53_profile_account_role_arn` - Optional - default: "arn:aws:iam::{{
+   aws[aws_route53_profile_account].id }}:role/route53_admin"
  - The IAM role in the aws account that has the route53 admin right. We will
  assume that role if possible.
 
-`aws_route53_profile_account_region` - required - default: "{{
+`aws_route53_profile_account_region` - Optional - default: "{{
    aws[aws_route53_profile_account].region|default(region) }}"
 
-`aws_route53_profile` - optional - no default 
+`aws_route53_profile` - optional - no default
  - This is the aws profile (defined in ~/.aws/credential) for the aws account
    which is used to create the route53 entry. If not provided then we will
-   assume the role using these above variables.
+   assume the role using these above variables. (means the above vars will be required.
 
-`aws_route53` - required - no default 
+`aws_route53` - required - no default
  - A dict which has the key that the ansible module 'route53' can understand.
    We will pass these value to the origin ansible route53 module.
    The key name is exactly the ansible module 'route53' parameter name.
@@ -50,7 +53,7 @@ Role Variables
 Dependencies
 ------------
 
-role: aws_profile_account 
+role: aws_profile_account
       to handle the case when we are running in ec2 which has the IAM profile
       that can assume the target route53_admin IAM role in the aws account that
       we create the entry.
